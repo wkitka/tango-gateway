@@ -40,4 +40,4 @@ optional arguments:
 Contact
 -------
 
-Vincent Michel: vincent.michel@maxlab.lu.se
+KITS : kitscontrol@maxiv.lu.se
