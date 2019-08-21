@@ -263,6 +263,9 @@ def find_tango_names(body):
     strings = []
     pattern = 'I'
     index = body.find(TANGO_TOKEN, 4) - 8
+    # If TANGO_TOKEN not found, tango is under 9.3, return empty list
+    if index < 0:
+        return strings, index
     sub_body = body[index:]
     for i in range(2):
         pattern += 'I'
