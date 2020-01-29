@@ -17,8 +17,6 @@ class EnvDefault(argparse.Action):
         if default and envvar:
             if envvar in os.environ:
                 default = os.environ[envvar]
-        if required and default:
-            required = False
         super(EnvDefault, self).__init__(
             default=default,
             required=required,
