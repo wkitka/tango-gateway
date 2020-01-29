@@ -13,10 +13,9 @@ except ImportError:
 
 
 class EnvDefault(argparse.Action):
-    def __init__(self, envvar, required=True, default=None, **kwargs):
-        if default and envvar:
-            if envvar in os.environ:
-                default = os.environ[envvar]
+    def __init__(self, envvar, required=False, default=None, **kwargs):
+        if envvar is not None and envvar in os.environ:
+            default = os.environ[envvar]
         super(EnvDefault, self).__init__(
             default=default,
             required=required,
