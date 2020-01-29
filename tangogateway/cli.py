@@ -35,11 +35,11 @@ def main(*args):
         description='Run a Tango gateway server')
     parser.add_argument(
         '--bind', '-b', metavar='ADDRESS', default='0.0.0.0',
-        action=EnvDefault, envvar='TANGOGATEWAY_BIND',
+        action=EnvDefault, envvar='TANGO_GATEWAY_BIND',
         help='Specify the bind address (default is all interfaces)')
     parser.add_argument(
         '--port', '-p', metavar='PORT', default=10000, type=int,
-        action=EnvDefault, envvar='TANGOGATEWAY_PORT',
+        action=EnvDefault, envvar='TANGO_GATEWAY_PORT',
         help='Port for the server (default is 10000)')
     parser.add_argument(
         '--tango', '-t', metavar='HOST',
