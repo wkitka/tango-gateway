@@ -43,7 +43,7 @@ def main(*args):
         help='Port for the server (default is 10000)')
     parser.add_argument(
         '--tango', '-t', metavar='HOST',
-        action=EnvDefault, envvar='TANGO_GATEWAY_TANGO',
+        action=EnvDefault, envvar='TANGO_GATEWAY_HOST',
         help='Tango host (default is given by PyTango)')
     parser.add_argument('--verbose', '-v', action='store_true')
     # Parse arguments
