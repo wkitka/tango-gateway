@@ -2,6 +2,7 @@
 
 # Imports
 import argparse
+import os
 from .gateway import run_gateway_server
 
 # Optional imports
@@ -9,6 +10,20 @@ try:
     import PyTango
 except ImportError:
     PyTango = None
+
+
+class EnvDefault(argparse.Action):
+    def __init__(self, envvar, required=False, default=None, **kwargs):
+        if envvar is not None and envvar in os.environ:
+            default = os.environ[envvar]
+        super(EnvDefault, self).__init__(
+            default=default,
+            required=required,
+            **kwargs
+        )
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        setattr(namespace, self.dest, values)
 
 
 def main(*args):
@@ -19,12 +34,15 @@ def main(*args):
         description='Run a Tango gateway server')
     parser.add_argument(
         '--bind', '-b', metavar='ADDRESS', default='0.0.0.0',
+        action=EnvDefault, envvar='TANGO_GATEWAY_BIND',
         help='Specify the bind address (default is all interfaces)')
     parser.add_argument(
         '--port', '-p', metavar='PORT', default=10000, type=int,
+        action=EnvDefault, envvar='TANGO_GATEWAY_PORT',
         help='Port for the server (default is 10000)')
     parser.add_argument(
         '--tango', '-t', metavar='HOST',
+        action=EnvDefault, envvar='TANGO_GATEWAY_HOST',
         help='Tango host (default is given by PyTango)')
     parser.add_argument('--verbose', '-v', action='store_true')
     # Parse arguments
