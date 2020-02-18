@@ -36,6 +36,25 @@ optional arguments:
                         Tango host (default is given by PyTango)
 ```
 
+Local testing
+-------------
+
+Developer can test this project locally by using minimal control system set up with ``docker-compose``
+
+Requirements:
+
+- docker
+- docker-compose
+
+To set up testing environment, run `docker-compose up -d` in project root directory.
+
+To see logs from Tango Gateway in real time, run `docker-compose logs -f gateway`.
+
+Test environment is separated in two netwroks: `net-int` and `net-ext`. `net-int` is internal network for Tango Control System.
+It consists of all services needed by Tango Control System like DatabaseDs, Jive, etc.
+Other network, `net-ext`, is separated from control system. Only joint point is `gateway` container. It has access to both networks.
+There are to client services, `pytango-in` and `pytango-ext`, both placed in different networks. They can be used for 
+connectivity tests.
 
 Contact
 -------
