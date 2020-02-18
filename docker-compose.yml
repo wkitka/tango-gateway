@@ -83,7 +83,7 @@ services:
     working_dir: /mnt
     environment:
       TANGO_GATEWAY_BIND: 0.0.0.0
-      TANGO_GATEWAY_PORT: 1000
+      TANGO_GATEWAY_PORT: 10000
       TANGO_GATEWAY_HOST: control-system:10000
     command: ["python3", "-m", "tangogateway", "--verbose"]
     volumes:
