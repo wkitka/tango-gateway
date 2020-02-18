@@ -1,0 +1,90 @@
+version: "3"
+
+networks:
+  net-int:
+    driver: bridge
+  net-ext:
+    driver: bridge
+
+services:
+
+  database:
+    image: tangocs/mysql:latest
+    environment:
+      - MYSQL_ALLOW_EMPTY_PASSWORD=1
+    networks:
+      - net-int
+
+  control-system:
+    image: tangocs/tango-cs:latest
+    environment:
+      - ORB_PORT=10000
+      - TANGO_HOST=127.0.0.1:10000
+      - MYSQL_HOST=database:3306
+      - MYSQL_USER=tango
+      - MYSQL_PASSWORD=tango
+      - MYSQL_DATABASE=tango
+    networks:
+      - net-int
+
+  tango-test:
+    image: tangocs/tango-test:latest
+    environment:
+      - TANGO_HOST=control-system:10000
+    depends_on:
+      - control-system
+    networks:
+      - net-int
+    command: ["test", "-v4"]
+
+  jive:
+    image: tangocs/tango-jive
+    networks:
+      - net-int
+    depends_on:
+      - control-system
+    environment:
+      TANGO_HOST: control-system:10000
+      DISPLAY: :0
+      _JAVA_OPTIONS: '-Dawt.useSystemAAFontSettings=lcd'
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix
+
+  pytango-in :
+    image: tangocs/tango-pytango
+    networks:
+      - net-int
+    depends_on:
+      - control-system
+    environment:
+      TANGO_HOST: control-system:10000
+    command: ["sleep", "3600"]
+
+  pytango-ext :
+    image: tangocs/tango-pytango
+    networks:
+      - net-ext
+    depends_on:
+      - gateway
+    environment:
+      TANGO_HOST: gateway:10000
+    command: ["sleep", "3600"]
+
+  gateway:
+    build:
+      context: .
+    hostname: gateway
+    networks:
+      - net-int
+      - net-ext
+    restart: on-failure
+    depends_on:
+      - control-system
+    working_dir: /mnt
+    environment:
+      TANGO_GATEWAY_BIND: 0.0.0.0
+      TANGO_GATEWAY_PORT: 1000
+      TANGO_GATEWAY_HOST: control-system:10000
+    command: ["python3", "-m", "tangogateway", "--verbose"]
+    volumes:
+      - ./tangogateway:/mnt/tangogateway
