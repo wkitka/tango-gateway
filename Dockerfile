@@ -1,10 +1,9 @@
-FROM alpine:3
-
-# TODO: determine and pin versions
-RUN apk update \
- && apk add --no-cache py3-zmq \
- && pip3 install -U --no-cache \
-    aiozmq==0.7.1 \
- && adduser -D runner
+FROM centos:7
+RUN yum install -y epel-release && yum makecache
+RUN yum install -y \
+    python3 \
+    python3-pip
+RUN pip3 install -U  aiozmq==0.7.1 pyzmq
+RUN adduser runner
 
 USER runner

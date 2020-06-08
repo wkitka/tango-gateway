@@ -24,6 +24,8 @@ services:
       - MYSQL_USER=tango
       - MYSQL_PASSWORD=tango
       - MYSQL_DATABASE=tango
+    depends_on:
+      - database
     networks:
       - net-int
 
@@ -35,14 +37,14 @@ services:
       - control-system
     networks:
       - net-int
-    command: ["test", "-v4"]
+    command: ["test", "-v6"]
 
-  jive:
+  jive-in:
     image: tangocs/tango-jive
     networks:
       - net-int
     depends_on:
-      - control-system
+      - tango-test
     environment:
       TANGO_HOST: control-system:10000
       DISPLAY: :0
@@ -50,25 +52,25 @@ services:
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix
 
-  pytango-in :
-    image: tangocs/tango-pytango
-    networks:
-      - net-int
-    depends_on:
-      - control-system
-    environment:
-      TANGO_HOST: control-system:10000
-    command: ["sleep", "3600"]
-
-  pytango-ext :
-    image: tangocs/tango-pytango
-    networks:
-      - net-ext
-    depends_on:
-      - gateway
-    environment:
-      TANGO_HOST: gateway:10000
-    command: ["sleep", "3600"]
+#  pytango-in :
+#    image: tangocs/tango-pytango
+#    networks:
+#      - net-int
+#    depends_on:
+#      - tango-test
+#    environment:
+#      TANGO_HOST: control-system:10000
+#    command: ["sleep", "3600"]
+#
+#  pytango-ext :
+#    image: tangocs/tango-pytango
+#    networks:
+#      - net-ext
+#    depends_on:
+#      - gateway
+#    environment:
+#      TANGO_HOST: gateway:10000
+#    command: ["sleep", "3600"]
 
   gateway:
     build:
@@ -79,7 +81,7 @@ services:
       - net-ext
     restart: on-failure
     depends_on:
-      - control-system
+      - tango-test
     working_dir: /mnt
     environment:
       TANGO_GATEWAY_BIND: 0.0.0.0
@@ -88,3 +90,16 @@ services:
     command: ["python3", "-m", "tangogateway", "--verbose"]
     volumes:
       - ./tangogateway:/mnt/tangogateway
+
+  jive-ext:
+    image: tangocs/tango-jive
+    networks:
+      - net-ext
+    depends_on:
+      - gateway
+    environment:
+      TANGO_HOST: gateway:10000
+      DISPLAY: :0
+      _JAVA_OPTIONS: '-Dawt.useSystemAAFontSettings=lcd'
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix
