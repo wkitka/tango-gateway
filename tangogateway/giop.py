@@ -277,10 +277,14 @@ def find_tango_names(body):
 
 
 def decode_tango_name(encoded):
-    host, rest = encoded[:-1].lstrip(TANGO_TOKEN).decode().split(':')
-    port, devname = rest.split('/', 1)
-    port = int(port)
-    return host, port, devname
+    if encoded[:-1].startswith(TANGO_TOKEN):
+        encoded = encoded[:-1][len(TANGO_TOKEN):]
+        host, rest = encoded.decode().split(':')
+        port, devname = rest.split('/', 1)
+        port = int(port)
+        return host, port, devname
+    else:
+        return None, None, None
 
 
 def encode_tango_name(host, port, devname):

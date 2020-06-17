@@ -354,15 +354,16 @@ def check_zmq(raw_body, bind_address, loop):
         # Make new endpoints
         new_endpoint = giop.encode_zmq_endpoint(zmq_bind_address, server_port)
         new_endpoints.append(new_endpoint)
-    # Exctract event sources
+    # Extract event sources
     # For tango >= 9.3.0 (ZMQ Topics are now returned by the server)
     (tango_names, _) = giop.find_tango_names(raw_body)
     for tango_name in tango_names:
         host, port, name = giop.decode_tango_name(tango_name)
-        # Make new names
-        new_tango_name = giop.encode_tango_name(
-            bind_address, loop.server_port, name)
-        new_endpoints.append(new_tango_name)
+        if None not in [host, port, name]:
+            # Make new names
+            new_tango_name = giop.encode_tango_name(
+                bind_address, loop.server_port, name)
+            new_endpoints.append(new_tango_name)
     # Repack body
     return giop.repack_zmq_endpoints(raw_body, new_endpoints, start)
 
