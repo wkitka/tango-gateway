@@ -7,9 +7,9 @@ from .gateway import run_gateway_server
 
 # Optional imports
 try:
-    import PyTango
+    import tango
 except ImportError:
-    PyTango = None
+    tango = None
 
 
 class EnvDefault(argparse.Action):
@@ -48,7 +48,7 @@ def main(*args):
     # Parse arguments
     namespace = parser.parse_args(*args)
     # Check Tango database
-    if PyTango is None:
+    if tango is None:
         if namespace.tango:
             print("Warning: PyTango not available, cannot check database")
             namespace.tango = namespace.tango.split(":")
@@ -57,9 +57,11 @@ def main(*args):
                          "the tango host has to be defined explicitely")
     else:
         if namespace.tango:
-            db = PyTango.Database(namespace.tango)
+            host = namespace.tango.split(":")[0]
+            port = namespace.tango.split(":")[1]
+            db = tango.Database(host, port)
         else:
-            db = PyTango.Database()
+            db = tango.Database()
         namespace.tango = db.get_db_host(), int(db.get_db_port())
     # Run the server
     return run_gateway_server(namespace.bind,
